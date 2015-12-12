@@ -14,10 +14,6 @@ import android.util.Log;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 /**
 
  * Created by jack on 12/11/2015.
@@ -56,7 +52,7 @@ public class PebbleReceptorService extends IntentService{
 
     @Override
     public void onDestroy() {
-        unregisterReceiver(pebbleReceiver);
+        //unregisterReceiver(pebbleReceiver);
         super.onDestroy();
     }
 
@@ -74,21 +70,8 @@ public class PebbleReceptorService extends IntentService{
             return;
         }
         called = true;
-        // will stop when phone sleeps
         Log.i("PebbleReceptor", "Receptor Initialized");
-        final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-
-        scheduler.scheduleAtFixedRate(
-                new Runnable() {
-                    public void run() {
-                        Log.i("PebbleReceptor", "Scanning");
-                        if (PebbleKit.isWatchConnected(PebbleReceptorService.this)) {
-                            Log.i("PebbleReceptor", "Receptor Started");
-                            startReception();
-                            scheduler.shutdown();
-                        }
-                    }
-                }, 0, 30, TimeUnit.SECONDS);
+        startReception();
 
         try {
             Thread.sleep(1000*240, 0);

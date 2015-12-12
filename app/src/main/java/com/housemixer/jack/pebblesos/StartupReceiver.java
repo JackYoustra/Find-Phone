@@ -11,8 +11,8 @@ public class StartupReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
-        Intent receivingService = new Intent("com.houemixer.jack.pebblesos.PebbleReceptorService");
-        receivingService.setClass(context, PebbleReceptorService.class);
-        context.startService(receivingService);
+//        Intent receivingService = new Intent("com.houemixer.jack.pebblesos.PebbleReceptorService");
+//        receivingService.setClass(context, PebbleReceptorService.class);
+//        context.startService(receivingService);
     }
 }

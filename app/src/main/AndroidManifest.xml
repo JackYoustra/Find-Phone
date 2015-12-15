@@ -19,12 +19,6 @@
             </intent-filter>
         </activity>
 
-        <receiver android:name=".StartupReceiver" >
-            <intent-filter>
-                <action android:name="android.intent.action.BOOT_COMPLETED" />
-            </intent-filter>
-        </receiver>
-
         <receiver
             android:name=".BluetoothStateChangeReceiver"
             android:enabled="true">
@@ -33,11 +27,7 @@
             </intent-filter>
         </receiver>
 
-        <service
-            android:name=".PebbleReceptorService"
-            android:exported="false"/>
     </application>
 
-    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"></uses-permission>
     <uses-permission android:name="android.permission.BLUETOOTH" />
 </manifest>

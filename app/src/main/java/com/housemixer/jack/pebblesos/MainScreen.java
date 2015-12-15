@@ -25,11 +25,6 @@ public class MainScreen extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-
-//        Intent receivingService = new Intent("com.houemixer.jack.pebblesos.PebbleReceptorService");
-//        receivingService.setClass(getApplicationContext(), PebbleReceptorService.class);
-//        getApplicationContext().startService(receivingService);
-
     }
 
 

@@ -7,6 +7,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
+import com.getpebble.android.kit.PebbleKit;
+
 /**
  * Created by jack on 12/12/2015.
  */
@@ -24,10 +26,8 @@ public class BluetoothStateChangeReceiver extends BroadcastReceiver{
                 String bluetoothName = d.getName();
                 Log.i("PebbleReceptor", "Bluetooth name: " + bluetoothName);
                 if(bluetoothName.toLowerCase().contains("pebble")){
-                    Log.i("PebbleReceptor", "Receptor Started");
-                    Intent receivingService = new Intent("com.houemixer.jack.pebblesos.PebbleReceptorService");
-                    receivingService.setClass(context, PebbleReceptorService.class);
-                    context.startService(receivingService);
+                    Log.i("PebbleReceptor", "Receptor Started if not already");
+                    PebbleKit.registerReceivedDataHandler(context.getApplicationContext(), SOSPebbleDataReceiver.getInstance());
                     break;
                 }
             }

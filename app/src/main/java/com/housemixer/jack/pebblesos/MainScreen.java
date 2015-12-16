@@ -25,8 +25,9 @@ public class MainScreen extends AppCompatActivity {
                         .setAction("Action", null).show();
             }
         });
-    }
 
+        BluetoothStateChangeReceiver.scanAndStart(this);
+    }
 
     @Override
     protected void onPause() {

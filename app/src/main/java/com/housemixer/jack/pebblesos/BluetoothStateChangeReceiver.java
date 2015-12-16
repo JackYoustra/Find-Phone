@@ -7,12 +7,12 @@ import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
 
-import com.getpebble.android.kit.PebbleKit;
-
 /**
  * Created by jack on 12/12/2015.
  */
 public class BluetoothStateChangeReceiver extends BroadcastReceiver{
+
+
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -21,17 +21,22 @@ public class BluetoothStateChangeReceiver extends BroadcastReceiver{
 
         if (BluetoothAdapter.ACTION_STATE_CHANGED.equals(action)) {
             Log.i("PebbleReceptor", "Scanning");
-                // check if it's a pebble that's connected
-            for(BluetoothDevice d : BluetoothAdapter.getDefaultAdapter().getBondedDevices()){
-                String bluetoothName = d.getName();
-                Log.i("PebbleReceptor", "Bluetooth name: " + bluetoothName);
-                if(bluetoothName.toLowerCase().contains("pebble")){
-                    Log.i("PebbleReceptor", "Receptor Started if not already");
-                    PebbleKit.registerReceivedDataHandler(context.getApplicationContext(), SOSPebbleDataReceiver.getInstance());
-                    break;
-                }
-            }
+            scanAndStart(context);
+
         }
 
+    }
+
+    static void scanAndStart(Context context) {
+        // check if it's a pebble that's connected
+        for(BluetoothDevice d : BluetoothAdapter.getDefaultAdapter().getBondedDevices()){
+            String bluetoothName = d.getName();
+            Log.i("PebbleReceptor", "Bluetooth name: " + bluetoothName);
+            if(bluetoothName.toLowerCase().contains("pebble")){
+                Intent serviceStarter = new Intent(context, ReceptorReceiverService.class);
+                context.startService(serviceStarter);
+                break;
+            }
+        }
     }
 }

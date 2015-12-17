@@ -1,6 +1,7 @@
 package com.housemixer.jack.pebblesos;
 
 import android.content.Context;
+import android.media.AudioManager;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -39,6 +40,9 @@ class SOSPebbleDataReceiver extends PebbleKit.PebbleDataReceiver {
     }
 
     public void ring(Context context){
+        AudioManager systemAudio = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+        systemAudio.setStreamVolume(AudioManager.STREAM_RING, systemAudio.getStreamMaxVolume(AudioManager.STREAM_RING), 0); // notification doesn't work
+
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         Ringtone r = RingtoneManager.getRingtone(context, notification);
         r.play();

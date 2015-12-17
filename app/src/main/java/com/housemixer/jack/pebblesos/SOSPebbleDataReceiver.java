@@ -38,10 +38,22 @@ class SOSPebbleDataReceiver extends PebbleKit.PebbleDataReceiver {
         Log.i("PebbleReceptor", "Message Received");
         long ringcodeMessage = data.getUnsignedIntegerAsLong(PebbleInfo.PEBBLE_APP_RINGCODE_KEY);
         if (ringcodeMessage == PebbleInfo.PEBBLE_APP_RINGCODE_VALUE) {
-            ring(context);
+            if(System.currentTimeMillis()-lastRingtoneTime > 750) { // don't want to ring it too much or will cause memory leak
+                lastRingtoneTime = System.currentTimeMillis();
+                if (recentRingtone != null) {
+                    synchronized (recentRingtone) {
+                        ring(context);
+                    }
+                } else {
+                    ring(context);
+                }
+            }
         }
         PebbleKit.sendAckToPebble(context, transactionId);
     }
+
+    private Ringtone recentRingtone = null;
+    private long lastRingtoneTime = 0;
 
     public void ring(Context context){
         final AudioManager systemAudio = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
@@ -51,8 +63,8 @@ class SOSPebbleDataReceiver extends PebbleKit.PebbleDataReceiver {
 
         // http://stackoverflow.com/questions/4441334/how-to-play-an-android-notification-sound
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        final Ringtone r = RingtoneManager.getRingtone(context, notification); // should be the same, don't need to worry about getting a different instnace each time
-        r.play();
+        recentRingtone = RingtoneManager.getRingtone(context, notification); // should be the same, don't need to worry about getting a different instnace each time
+        recentRingtone.play();
 
         if (maxVolume != currentVolume) {
             // not max before, need to change back when done, do this by brute-force play-checking
@@ -60,10 +72,12 @@ class SOSPebbleDataReceiver extends PebbleKit.PebbleDataReceiver {
             scheduler.scheduleAtFixedRate(new Runnable() {
                 @Override
                 public void run() {
-                    if(!r.isPlaying()){
-                        // reset and clean up
-                        systemAudio.setStreamVolume(AudioManager.STREAM_RING, currentVolume, 0);
-                        scheduler.shutdown();
+                    synchronized (recentRingtone) {
+                        if (!recentRingtone.isPlaying()) {
+                            // reset and clean up
+                            systemAudio.setStreamVolume(AudioManager.STREAM_RING, currentVolume, 0);
+                            scheduler.shutdown();
+                        }
                     }
                 }
             }, 1000, 750, TimeUnit.MILLISECONDS);

@@ -2,7 +2,7 @@ package com.housemixer.jack.pebblesos;
 
 import android.content.Context;
 import android.media.AudioManager;
-import android.media.Ringtone;
+import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
 import android.util.Log;
@@ -10,16 +10,13 @@ import android.util.Log;
 import com.getpebble.android.kit.PebbleKit;
 import com.getpebble.android.kit.util.PebbleDictionary;
 
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
-import java.util.concurrent.TimeUnit;
-
 /**
  * Created by jack on 12/15/2015.
  */
 class SOSPebbleDataReceiver extends PebbleKit.PebbleDataReceiver {
 
     public static SOSPebbleDataReceiver instance = null;
+    public static MediaPlayer ringPlayer = null;
 
     public static SOSPebbleDataReceiver getInstance(){
         if(instance == null){
@@ -38,51 +35,36 @@ class SOSPebbleDataReceiver extends PebbleKit.PebbleDataReceiver {
         Log.i("PebbleReceptor", "Message Received");
         long ringcodeMessage = data.getUnsignedIntegerAsLong(PebbleInfo.PEBBLE_APP_RINGCODE_KEY);
         if (ringcodeMessage == PebbleInfo.PEBBLE_APP_RINGCODE_VALUE) {
-            if(System.currentTimeMillis()-lastRingtoneTime > 750) { // don't want to ring it too much or will cause memory leak
-                lastRingtoneTime = System.currentTimeMillis();
-                if (recentRingtone != null) {
-                    synchronized (recentRingtone) {
-                        ring(context);
-                    }
-                } else {
-                    ring(context);
-                }
-            }
+            ring(context);
+
         }
         PebbleKit.sendAckToPebble(context, transactionId);
     }
 
-    private Ringtone recentRingtone = null;
-    private long lastRingtoneTime = 0;
-
     public void ring(Context context){
         final AudioManager systemAudio = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
-        final int maxVolume = systemAudio.getStreamMaxVolume(AudioManager.STREAM_RING);
-        final int currentVolume = systemAudio.getStreamVolume(AudioManager.STREAM_RING);
-        systemAudio.setStreamVolume(AudioManager.STREAM_RING, maxVolume, 0); // notification doesn't work
+        final int streamMusic = AudioManager.STREAM_MUSIC;
+        final int currentAudioLevel = systemAudio.getStreamVolume(streamMusic);
+        final int streamMaxVolume = systemAudio.getStreamMaxVolume(streamMusic);
+        systemAudio.setStreamVolume(streamMusic, streamMaxVolume, 0); // notification doesn't work
 
-        // http://stackoverflow.com/questions/4441334/how-to-play-an-android-notification-sound
+
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        recentRingtone = RingtoneManager.getRingtone(context, notification); // should be the same, don't need to worry about getting a different instnace each time
-        recentRingtone.play();
-
-        if (maxVolume != currentVolume) {
-            // not max before, need to change back when done, do this by brute-force play-checking
-            final ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
-            scheduler.scheduleAtFixedRate(new Runnable() {
+        if(ringPlayer == null) {
+            ringPlayer = MediaPlayer.create(context, notification);
+            ringPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
-                public void run() {
-                    synchronized (recentRingtone) {
-                        if (!recentRingtone.isPlaying()) {
-                            // reset and clean up
-                            systemAudio.setStreamVolume(AudioManager.STREAM_RING, currentVolume, 0);
-                            scheduler.shutdown();
-                        }
-                    }
+                public void onCompletion(MediaPlayer mp) {
+                    systemAudio.setStreamVolume(streamMusic, currentAudioLevel, 0);
+                    ringPlayer.release();
+                    ringPlayer = null;
                 }
-            }, 1000, 750, TimeUnit.MILLISECONDS);
-            // no communication needed between worker and parent so using thread instead of handler
+            });
         }
+        else{
+            ringPlayer.seekTo(0);
+        }
+        ringPlayer.start();
     }
 
 }

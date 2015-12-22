@@ -42,15 +42,15 @@ class SOSPebbleDataReceiver extends PebbleKit.PebbleDataReceiver {
         PebbleKit.sendAckToPebble(context, transactionId);
     }
 
-    public void ring(Context context){
-        final AudioManager systemAudio = (AudioManager)context.getSystemService(Context.AUDIO_SERVICE);
+    public void ring(Context context) {
+        final AudioManager systemAudio = (AudioManager) context.getSystemService(Context.AUDIO_SERVICE);
         final int streamMusic = AudioManager.STREAM_MUSIC;
         final int currentAudioLevel = systemAudio.getStreamVolume(streamMusic);
         final int streamMaxVolume = systemAudio.getStreamMaxVolume(streamMusic);
         systemAudio.setStreamVolume(streamMusic, streamMaxVolume, 0); // notification doesn't work
 
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        if(ringPlayer == null) {
+        if (ringPlayer == null) {
             ringPlayer = MediaPlayer.create(context, notification);
             ringPlayer.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                 @Override
@@ -60,19 +60,15 @@ class SOSPebbleDataReceiver extends PebbleKit.PebbleDataReceiver {
                     ringPlayer = null;
                 }
             });
-        }
-        else{
+        } else {
             ringPlayer.seekTo(0);
         }
         ringPlayer.start();
-
-        if(FileInteractor.isVibrateEnabled(context)){
-            // vibrate
-            Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
-            int vibrationDuration = ringPlayer.getDuration();
-            if (vibrationDuration == -1) vibrationDuration = 3;
-            vibrator.vibrate(vibrationDuration);
-        }
+        // automatically vibrate
+        Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+        int vibrationDuration = ringPlayer.getDuration();
+        if (vibrationDuration == -1) vibrationDuration = 3;
+        vibrator.vibrate(vibrationDuration);
     }
 
 }

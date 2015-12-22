@@ -2,6 +2,9 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.housemixer.jack.pebblesos">
 
+    <uses-permission android:name="android.permission.BLUETOOTH" />
+    <uses-permission android:name="android.permission.VIBRATE"/>
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -23,13 +26,13 @@
             android:name=".BluetoothStateChangeReceiver"
             android:enabled="true">
             <intent-filter>
-                <action android:name="android.bluetooth.adapter.action.STATE_CHANGED"/>
+                <action android:name="android.bluetooth.adapter.action.STATE_CHANGED" />
             </intent-filter>
         </receiver>
 
-    <service android:name="com.housemixer.jack.pebblesos.ReceptorReceiverService" > </service>
+        <service android:name=".ReceptorReceiverService"></service>
 
+        <activity android:name=".SettingsActivity"></activity>
     </application>
 
-    <uses-permission android:name="android.permission.BLUETOOTH" />
 </manifest>

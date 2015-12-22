@@ -48,7 +48,6 @@ class SOSPebbleDataReceiver extends PebbleKit.PebbleDataReceiver {
         final int streamMaxVolume = systemAudio.getStreamMaxVolume(streamMusic);
         systemAudio.setStreamVolume(streamMusic, streamMaxVolume, 0); // notification doesn't work
 
-
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         if(ringPlayer == null) {
             ringPlayer = MediaPlayer.create(context, notification);
@@ -65,6 +64,11 @@ class SOSPebbleDataReceiver extends PebbleKit.PebbleDataReceiver {
             ringPlayer.seekTo(0);
         }
         ringPlayer.start();
+
+        if(FileInteractor.isVibrateEnabled(context)){
+            // vibrate
+
+        }
     }
 
 }

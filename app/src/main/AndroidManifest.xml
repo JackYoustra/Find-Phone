@@ -32,7 +32,10 @@
 
         <service android:name=".ReceptorReceiverService"></service>
 
-        <activity android:name=".SettingsActivity"></activity>
+        <activity
+            android:name=".SettingsActivity"
+            android:label="@string/settings_activity_name">
+        </activity>
     </application>
 
 </manifest>

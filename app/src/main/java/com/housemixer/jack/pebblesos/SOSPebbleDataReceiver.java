@@ -5,6 +5,7 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.media.RingtoneManager;
 import android.net.Uri;
+import android.os.Vibrator;
 import android.util.Log;
 
 import com.getpebble.android.kit.PebbleKit;
@@ -67,7 +68,10 @@ class SOSPebbleDataReceiver extends PebbleKit.PebbleDataReceiver {
 
         if(FileInteractor.isVibrateEnabled(context)){
             // vibrate
-
+            Vibrator vibrator = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
+            int vibrationDuration = ringPlayer.getDuration();
+            if (vibrationDuration == -1) vibrationDuration = 3;
+            vibrator.vibrate(vibrationDuration);
         }
     }
 

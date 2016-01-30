@@ -64,6 +64,13 @@ class SOSPebbleDataReceiver extends PebbleKit.PebbleDataReceiver {
         final int streamMaxVolume = systemAudio.getStreamMaxVolume(streamMusic);
         systemAudio.setStreamVolume(streamMusic, streamMaxVolume, 0); // notification doesn't work
 
+        // set output source to make on phone speakers
+        final int mode = systemAudio.getMode();
+        final boolean speakerphoneMode = systemAudio.isSpeakerphoneOn();
+        systemAudio.setMode(AudioManager.MODE_IN_CALL);
+        systemAudio.setSpeakerphoneOn(true);
+
+
         Uri notification = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         if (ringPlayer == null) {
             ringPlayer = MediaPlayer.create(context, notification);
@@ -73,6 +80,10 @@ class SOSPebbleDataReceiver extends PebbleKit.PebbleDataReceiver {
                     systemAudio.setStreamVolume(streamMusic, currentAudioLevel, 0);
                     ringPlayer.release();
                     ringPlayer = null;
+
+                    // change back audio settings
+                    systemAudio.setMode(mode);
+                    systemAudio.setSpeakerphoneOn(speakerphoneMode);
                 }
             });
         } else {

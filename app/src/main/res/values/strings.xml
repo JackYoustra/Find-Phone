@@ -1,4 +1,5 @@
 <resources>
-    <string name="app_name">Pebble SOS</string>
+    <string name="app_name">Phone Finder for Pebble Watch</string>
+    <string name="app_short_name">Phone Finder</string>
     <string name="settings_activity_name">Settings</string>
 </resources>
